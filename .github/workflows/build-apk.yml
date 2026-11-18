@@ -20,8 +20,15 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: SDK Android
-        uses: android-actions/setup-android@v3
+      # Le runner GitHub embarque déjà le SDK Android : on se contente
+      # d'accepter les licences et de s'assurer que la plateforme 35 est là.
+      # (l'action setup-android reste bloquée sur l'invite des licences)
+      - name: Licences et plateforme Android
+        run: |
+          SDK="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          echo "SDK utilisé : $SDK"
+          yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
+          "$SDK/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0" || true
 
       - name: Gradle
         uses: gradle/actions/setup-gradle@v4
